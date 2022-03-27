@@ -1,7 +1,7 @@
 
 FileEncoding("UTF-8")
 appName:="auto upgrader"
-version:="0.0.1alpha 内部测试版本"
+version:="0.0.2alpha 内部测试版本"
 versionFilename:="version.txt"
 ahkFilename:="app.ahk"
 binaryFilename:="CYKSM.exe"

@@ -66,7 +66,7 @@ Class anime4x
 	static go() {
 		this.state := 1
 		SetTimer(this.callbackfunc, 150)
-		RunWait(A_Temp "\CYKSM\rn-vulkan.exe -i " this.inputfile " -o " this.outputfile " -n realesrgan-x4plus-anime -m models_realesrgan",,"Hide")
+		RunWait(A_Temp '\CYKSM\rn-vulkan.exe -i "' this.inputfile '" -o "' this.outputfile '" -n realesrgan-x4plus-anime -m models_realesrgan',,"Hide")
 		SetTimer(this.callbackfunc, 0)
 		this.state := 0
 		this.output_bitmap:=Gdip_CreateBitmapFromFile(this.outputfile)
@@ -76,6 +76,7 @@ Class anime4x
 
 
 mygui:=Gui("-AlwaysOnTop -Owner")
+myGui.OnEvent("Close", myGui_Close)
 myGui.OnEvent("DropFiles", mygui_DropFiles)
 mygui.SetFont("s32 Q5", "Meiryo")
 mygui.Add("Text","x20 y10 Section","次元克赛马")
@@ -183,9 +184,9 @@ mygui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y) {
 		anime4x.outputpath(A_Desktop "\" name "_4x.png")
 	}
 }
-
-GuiClose:
-ExitApp
+mygui_Close(thisGui) {
+	trueExit(0, 0)
+}
 trueExit(ExitReason, ExitCode){
 	global pGDI
 	Gdip_Shutdown(pGDI)
