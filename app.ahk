@@ -180,7 +180,8 @@ mygui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y) {
 		Return
 	}
 	SplitPath(FileArray[1],,,&Ext)
-	if(anime4x.inputpath(FileArray[1])<=0||!InStr("jpgjpegpng",Ext,0)) {
+	
+	if(anime4x.inputpath(FileArray[1])<=0||!RegExMatch(Ext, "i)(jpg|jpeg|png|jfif)$")) {
 		MsgBox "无效的图片文件"
 	} else {
 		runBtn.Enabled:=True
