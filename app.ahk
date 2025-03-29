@@ -101,8 +101,14 @@ mygui.Add("Link","xp y+0",'bilibili: <a href="https://space.bilibili.com/895523"
 mygui.Add("Link","xp y+0",'GitHub: <a href="https://github.com/Nigh">xianii</a>')
 mygui.Add("Text","x50 yp","二次元反向马赛克工具")
 
-ori_pic:=mygui.Add("Picture", "x20 w400 h400 0xE 0x200 0x800000 -0x40")
+mygui.SetFont("s10 Q5 Bold", "Meiryo")
+ori_label:=mygui.Add("Text","x20 y+10 w400 h20 center", "原图")
+new_label:=mygui.Add("Text","x+10 yp w400 h20 center", "转换后")
+ori_pic:=mygui.Add("Picture", "x20 y+0 w400 h400 0xE 0x200 0x800000 -0x40")
 new_pic:=mygui.Add("Picture", "x+10 w400 h400 0xE 0x200 0x800000 -0x40")
+ori_size:=mygui.Add("Text","x20 y+0 w400 h20 center", "NULL")
+new_size:=mygui.Add("Text","x+10 yp w400 h20 center", "NULL")
+
 runBtn:=mygui.Add("Button", "x20 y+10 w810 r3 Disabled", "转换")
 runBtn.OnEvent("Click", generate)
 
@@ -110,8 +116,10 @@ generate(btn, *) {
 	btn.Enabled:=false
 	btn.Text := "转换中"
 	ends(){
-		global new_pic, ori_pic
+		global new_pic, ori_pic, new_size
 		btn.Text:="转换"
+		Gdip_GetImageDimensions(anime4x.output_bitmap, &W, &H)
+		new_size.Text := W "x" H
 		mygui_ctrl_show_pic(new_pic, anime4x.output_bitmap)
 		btn.gui.Opt("+OwnDialogs")
 		MsgBox("转换完成，已保存为`n" anime4x.outputfile)
@@ -134,7 +142,7 @@ Return
 
 mygui_set_pic_size(picW, picH)
 {
-	global Screen_Width, Screen_Height, ori_pic, new_pic, runBtn, gui_margin
+	global Screen_Width, Screen_Height, ori_pic, new_pic, ori_label, new_label, ori_size, new_size, runBtn, gui_margin
 
 	ratio := picW / picH
 
@@ -151,13 +159,22 @@ mygui_set_pic_size(picW, picH)
 	ctrlH := Round(picH * percent) + 0
 	ctrlW := Round(ctrlH * ratio) + 0
 
+	ori_label.Move(gui_margin, , ctrlW, 20)
+	new_label.Move(gui_margin+gui_margin+ctrlW, , ctrlW, 20)
 	ori_pic.Move(gui_margin, , ctrlW, ctrlH)
 	new_pic.Move(gui_margin+gui_margin+ctrlW, , ctrlW, ctrlH)
 	ori_pic.GetPos(,&y)
-	runBtn.Move(gui_margin, y+ctrlH+gui_margin, 2*ctrlW+gui_margin)
+	ori_size.Move(gui_margin, y+ctrlH, ctrlW, 20)
+	new_size.Move(gui_margin+gui_margin+ctrlW, y+ctrlH, ctrlW, 20)
+
+	runBtn.Move(gui_margin, y+ctrlH+gui_margin+20, 2*ctrlW+gui_margin)
 	new_pic.gui.Show("AutoSize xCenter yCenter")
+	ori_label.Redraw()
+	new_label.Redraw()
 	new_pic.Redraw()
 	ori_pic.Redraw()
+	ori_size.Redraw()
+	new_size.Redraw()
 	Return percent
 }
 
@@ -180,7 +197,7 @@ mygui_ctrl_show_pic(GuiCtrlObj, pBitmap)
 }
 
 mygui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y) {
-	global ori_pic, new_pic, runBtn
+	global ori_pic, new_pic, ori_size, new_size, runBtn
 	GuiObj.Opt("+OwnDialogs")
 	if(FileArray.Length>1) {
 		MsgBox "一次只能拖进一个文件哦"
@@ -192,7 +209,11 @@ mygui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y) {
 		MsgBox "无效的图片文件"
 	} else {
 		runBtn.Enabled:=True
+		Gdip_GetImageDimensions(anime4x.input_bitmap, &W, &H)
 		mygui_ctrl_show_pic(ori_pic ,anime4x.input_bitmap)
+		ori_size.Text := W "x" H
+		new_size.Text := "NULL"
+		
 		SetImage(new_pic.hwnd, 0)
 		
 		SplitPath(FileArray[1],,,,&name)
