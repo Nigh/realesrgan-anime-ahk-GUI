@@ -28,9 +28,17 @@ FileInstall(".\vcomp140d.dll", A_Temp "\CYKSM\vcomp140d.dll", 1)
 FileInstall(".\models_realesrgan\realesrgan-x4plus-anime.bin", A_Temp "\CYKSM\models_realesrgan\realesrgan-x4plus-anime.bin", 1)
 FileInstall(".\models_realesrgan\realesrgan-x4plus-anime.param", A_Temp "\CYKSM\models_realesrgan\realesrgan-x4plus-anime.param", 1)
 
-MonitorGet(1, &Left, &Top, &Right, &Bottom)
+MonitorGet(0, &Left, &Top, &Right, &Bottom)
+DPIScale := A_ScreenDPI / 96
+DPIScaled(n) {
+	return Round(n * DPIScale)
+}
+DPIScaledFont(n) {
+	return Round(n * (DPIScale ** 0.5))
+}
 Screen_Height:=Bottom-Top
 Screen_Width:=Right-Left
+gui_margin := DPIScaled(10)
 
 #include Gdip_All.ahk
 pGDI := Gdip_Startup()
@@ -75,7 +83,7 @@ Class anime4x
 }
 
 
-mygui:=Gui("-AlwaysOnTop -Owner")
+mygui:=Gui("-AlwaysOnTop -Owner -DpiScale")
 myGui.OnEvent("Close", myGui_Close)
 myGui.OnEvent("DropFiles", mygui_DropFiles)
 mygui.SetFont("s32 Q5", "Meiryo")
@@ -119,30 +127,28 @@ Return
 
 mygui_set_pic_size(picW, picH)
 {
-	global Screen_Width, Screen_Height, ori_pic, new_pic, runBtn
-	minW:=400
-	minH:=400
+	global Screen_Width, Screen_Height, ori_pic, new_pic, runBtn, gui_margin
+
+	ratio := picW / picH
+
+	minW:=DPIScaled(400)
+	minH:=DPIScaled(400)
 	maxW:=0.4*Screen_Width
 	maxH:=0.6*Screen_Height
 
-	percentW:=maxW/picW
-	percentH:=maxH/picH
-	percentMin:=Min(percentW, percentH)
+	percent := 1
+	percent := Min(percent, maxH / picH)
+	percent := Min(percent, maxW / picW)
+	percent *= Min(maxW / (picH * percent * ratio), 1)
 
-	if(percentMin<1) {
-		ctrlW:=picW*percentMin<400 ? 400:picW*percentMin
-		ctrlH:=picH*percentMin<400 ? 400:picH*percentMin
-		percent:=percentMin
-	} else {
-		ctrlW:=picW<400 ? 400:picW
-		ctrlH:=picH<400 ? 400:picH
-		percent:=1
-	}
-	ori_pic.Move(20, , ctrlW, ctrlH)
-	new_pic.Move(20+20+ctrlW, , ctrlW, ctrlH)
+	ctrlH := Round(picH * percent) + 0
+	ctrlW := Round(ctrlH * ratio) + 0
+
+	ori_pic.Move(gui_margin, , ctrlW, ctrlH)
+	new_pic.Move(gui_margin+gui_margin+ctrlW, , ctrlW, ctrlH)
 	ori_pic.GetPos(,&y)
-	runBtn.Move(20, y+ctrlH+10, 2*ctrlW+10)
-	new_pic.gui.Show("AutoSize")
+	runBtn.Move(gui_margin, y+ctrlH+gui_margin, 2*ctrlW+gui_margin)
+	new_pic.gui.Show("AutoSize xCenter yCenter")
 	new_pic.Redraw()
 	ori_pic.Redraw()
 	Return percent
@@ -154,7 +160,7 @@ mygui_ctrl_show_pic(GuiCtrlObj, pBitmap)
 	percent := mygui_set_pic_size(W, H)
 	picW:=W*percent
 	picH:=H*percent
-	GuiCtrlObj.GetPos(,, &ctrlW, &ctrlH)
+	; GuiCtrlObj.GetPos(,, &ctrlW, &ctrlH)
 	pBitmapShow := Gdip_CreateBitmap(picW, picH)
 	G := Gdip_GraphicsFromImage(pBitmapShow)
 	Gdip_SetSmoothingMode(G, 4)
