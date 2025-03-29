@@ -107,7 +107,7 @@ generate(btn, *) {
 		btn.Text:="转换"
 		mygui_ctrl_show_pic(new_pic, anime4x.output_bitmap)
 		btn.gui.Opt("+OwnDialogs")
-		MsgBox("转换完成，已保存在桌面")
+		MsgBox("转换完成，已保存为`n" anime4x.outputfile)
 	}
 	proc() {
 		if(StrLen(btn.Text)<19) {
@@ -189,7 +189,7 @@ mygui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y) {
 		SetImage(new_pic.hwnd, 0)
 		
 		SplitPath(FileArray[1],,,,&name)
-		anime4x.outputpath(A_Desktop "\" name "_4x.png")
+		anime4x.outputpath(A_ScriptDir "\" name "_4x.png")
 	}
 }
 mygui_Close(thisGui) {
