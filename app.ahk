@@ -1,4 +1,4 @@
-﻿
+
 SetWorkingDir(A_ScriptDir)
 #SingleInstance force
 #include meta.ahk
@@ -169,6 +169,7 @@ mygui_ctrl_show_pic(GuiCtrlObj, pBitmap)
 	hBitmapShow := Gdip_CreateHBITMAPFromBitmap(pBitmapShow)
 	SetImage(GuiCtrlObj.hwnd, hBitmapShow)
 	Gdip_DeleteGraphics(G), Gdip_DisposeImage(pBitmapShow), DeleteObject(hBitmapShow)
+	Gdip_DisposeImage(pBitmap)
 }
 
 mygui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y) {
