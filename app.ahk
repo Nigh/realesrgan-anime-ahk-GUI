@@ -1,4 +1,4 @@
-
+﻿
 SetWorkingDir(A_ScriptDir)
 #SingleInstance force
 #include meta.ahk
@@ -72,6 +72,13 @@ Class anime4x
 	}
 
 	static go() {
+		if not FileExist(this.inputfile) {
+			MsgBox "未找到输入图片，请重新拖入"
+			return
+		}
+		if FileExist(this.outputfile) {
+			FileDelete this.outputfile
+		}
 		this.state := 1
 		SetTimer(this.callbackfunc, 150)
 		RunWait(A_Temp '\CYKSM\rn-vulkan.exe -i "' this.inputfile '" -o "' this.outputfile '" -n realesrgan-x4plus-anime -m models_realesrgan',,"Hide")
