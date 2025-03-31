@@ -3,6 +3,23 @@ SetWorkingDir(A_ScriptDir)
 
 #include meta.ahk
 
+try
+{
+	props := FileOpen("compile_prop.ahk", "w")
+	props.WriteLine(";@Ahk2Exe-SetName " appName)
+	props.WriteLine(";@Ahk2Exe-SetVersion " version)
+	props.WriteLine(";@Ahk2Exe-SetMainIcon icon.ico")
+	props.WriteLine(";@Ahk2Exe-SetCompanyName HelloWorks")
+	props.WriteLine(";@Ahk2Exe-SetDescription ahko")
+	props.WriteLine(";@Ahk2Exe-ExeName " appName)
+	props.Close()
+}
+catch as e
+{
+	MsgBox("Writting compile props`nERROR CODE=" . e.Message)
+	ExitApp
+}
+
 if FileExist(binaryFilename)
 {
 	FileDelete(binaryFilename)
@@ -28,19 +45,16 @@ if InStr(FileExist("dist"), "D")
 
 DirCreate("dist")
 
-try
-{
-	RunWait("./binary/ahk2exe.exe /in updater.ahk /out updater.exe /base `"" A_AhkPath "`" /compress 1")
-}
-catch as e
-{
-	MsgBox("updater.ahk`nERROR CODE=" . e.Message)
+try {
+	RunWait("./ahk-compile-toolset/tcc/tcc.exe ./ahk-compile-toolset/updater.c -DdownloadFilename='`"" downloadFilename "`"' -DbinaryFilename='`"" binaryFilename "`"'")
+} catch as e {
+	MsgBox("updater compile`nERROR CODE=" . e.Message)
 	ExitApp
 }
 
 try
 {
-	RunWait("./binary/ahk2exe.exe /in " ahkFilename " /out " binaryFilename " /base `"" A_AhkPath "`" /compress 1")
+	RunWait("./ahk-compile-toolset/ahk2exe.exe /in " ahkFilename " /out " binaryFilename " /base `"" A_AhkPath "`" /compress 1")
 }
 catch as e
 {
@@ -50,7 +64,7 @@ catch as e
 
 try
 {
-	RunWait("./binary/AutoHotkey64.exe .\" . ahkFilename . " --out=version")
+	RunWait("./ahk-compile-toolset/AutoHotkey64.exe .\" . ahkFilename . " --out=version")
 }
 catch as e
 {
@@ -60,7 +74,7 @@ catch as e
 
 try
 {
-	RunWait("powershell -command `"Compress-Archive -Path .\" binaryFilename " -DestinationPath " downloadFilename '"',, "Hide")
+	RunWait("powershell -command `"Compress-Archive -Path .\" binaryFilename " -DestinationPath " downloadFilename '"', , "Hide")
 }
 catch as e
 {
