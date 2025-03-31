@@ -97,7 +97,7 @@ mygui.SetFont("s32 Q5", "Meiryo")
 mygui.Add("Text","x20 y10 Section","次元克赛马")
 mygui.SetFont("s10 Q5", "Meiryo")
 mygui.Add("Text","x+20 y+-52","v" . version)
-mygui.Add("Link","xp y+0",'bilibili: <a href="https://space.bilibili.com/895523">下限Nico</a>')
+mygui.Add("Link","xp y+0",'bilibili: <a href="https://space.bilibili.com/895523">TecNico</a>')
 mygui.Add("Link","xp y+0",'GitHub: <a href="https://github.com/Nigh">xianii</a>')
 mygui.Add("Text","x50 yp","二次元反向马赛克工具")
 
