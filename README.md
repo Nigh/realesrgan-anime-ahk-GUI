@@ -3,7 +3,7 @@
 A GUI for `realesrgan-x4plus-anime`  
 一个`realesrgan-x4plus-anime`模型的简单图形界面。因为有着消除部分马赛克的能力，既然可以反马赛克，不如就叫做克赛马好了。
 
-![](showcase.png)
+![](https://raw.githubusercontent.com/Nigh/realesrgan-anime-ahk-GUI/refs/heads/main/showcase.png)
 
 ## Usage
 将需要超分辨率的图片拖入左侧，点击按钮即可进行超分。处理后的图片将会保存在软件相同目录下。  
