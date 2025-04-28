@@ -1,4 +1,14 @@
-# 次元克赛马
+
+<div>
+	<div align="center">
+		<img height="180px" src="https://github.com/user-attachments/assets/530e2f35-849f-4481-83cf-07e5a021ed41"/>
+	</div>
+	<div align="center">
+		<img src="https://capsule-render.vercel.app/api?type=transparent&fontColor=dbdbdb&text=次元克赛马&height=80&fontSize=48"/>
+	</div>
+</div>
+
+---
 
 A GUI for `realesrgan-x4plus-anime`  
 一个`realesrgan-x4plus-anime`模型的简单图形界面。因为有着消除部分马赛克的能力，既然可以反马赛克，不如就叫做克赛马好了。
