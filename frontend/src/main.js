@@ -11,6 +11,11 @@
 	const outputPreview = document.getElementById("output-preview")
 	const outputProcess = document.getElementById("output-process")
 	const startBtn = document.getElementById("start-btn")
+	const resetHoverClasses = [
+		"cursor-pointer",
+		"hover:border-error",
+		"hover:bg-error/20",
+	]
 	let state = "idle"
 	window.getState = () => state
 
@@ -40,6 +45,8 @@
 		e.stopPropagation()
 	}
 
+	document.addEventListener("dragover", (e) => e.preventDefault())
+	document.addEventListener("drop", (e) => e.preventDefault())
 	;["dragenter", "dragover", "dragleave", "drop"].forEach((evt) => {
 		pInput.addEventListener(evt, prevent, false)
 	})
@@ -181,6 +188,7 @@
 		switch (state) {
 			default:
 			case "idle":
+				pInput.classList.remove(...resetHoverClasses)
 				outputHint.style.display = "flex"
 				dropHint.style.display = "flex"
 
@@ -189,7 +197,7 @@
 				outputProcess.style.display = "none"
 
 				filePicker.value = null
-				
+
 				inputResolution.setAttribute("data-i18n", "res_placeholder")
 				if (window.i18n) window.i18n.updateElement(inputResolution)
 				else inputResolution.textContent = ""
@@ -203,21 +211,23 @@
 				if (window.i18n) window.i18n.updateElement(startBtn)
 				break
 			case "ready":
+				pInput.classList.add(...resetHoverClasses)
 				inputPreview.style.display = "block"
 				dropHint.style.display = "none"
-				
+
 				// Clear output (partial reset logic)
 				outputHint.style.display = "flex"
 				outputPreview.style.display = "none"
 				outputProcess.style.display = "none"
 				outputResolution.setAttribute("data-i18n", "res_placeholder")
 				if (window.i18n) window.i18n.updateElement(outputResolution)
-				
+
 				startBtn.classList.remove("btn-disabled")
 				startBtn.setAttribute("data-i18n", "start")
 				if (window.i18n) window.i18n.updateElement(startBtn)
 				break
 			case "processing":
+				pInput.classList.remove(...resetHoverClasses)
 				outputHint.style.display = "none"
 				outputProcess.style.display = "flex"
 				startBtn.classList.add("btn-disabled")
@@ -225,6 +235,7 @@
 				if (window.i18n) window.i18n.updateElement(startBtn)
 				break
 			case "done":
+				pInput.classList.add(...resetHoverClasses)
 				outputPreview.style.display = "block"
 				outputProcess.style.display = "none"
 				startBtn.classList.remove("btn-disabled")
