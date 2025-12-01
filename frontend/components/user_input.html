@@ -1,5 +1,5 @@
 <script>
-	function start4x() {
+	function start() {
 		const inputPreview = document.getElementById("input-preview")
 		// validate the preview.src is valid base64
 		const base64Regex = /^data:image\/(?:jpeg|png|webp);base64/
@@ -7,7 +7,8 @@
 			// showMessage("Please select an image first.", "error")
 			return
 		}
-		ahk.anime4x(inputPreview.src)
+		const scale = document.getElementById("keep-res").checked ? 0.25 : 1
+		ahk.CYKSMRun(inputPreview.src, scale)
 		window.setMainState("processing")
 	}
 	function reset() {
@@ -16,11 +17,11 @@
 	function mainBtnClick() {
 		switch (window.getState()) {
 			case "ready":
-				start4x()
-				break;
+				start()
+				break
 			case "done":
 				reset()
-				break;
+				break
 		}
 	}
 </script>
@@ -36,6 +37,7 @@
 	></button>
 	<label class="label">
 		<input
+			id="keep-res"
 			type="checkbox"
 			checked="checked"
 			class="checkbox hover:border-primary checked:bg-primary"

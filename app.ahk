@@ -38,8 +38,7 @@ MyGui := WebViewGui("+Resize +MinSize800x600", , , WebViewSettings)
 MyGui.OnEvent("Close", mygui_Close)
 
 MyGui.AddCallbackToScript("Visit", WebviewVisit)
-MyGui.AddCallbackToScript("anime4x", Anime4xRun)
-MyGui.AddCallbackToScript("animePolish", AnimePolishRun)
+MyGui.AddCallbackToScript("CYKSMRun", CYKSMRun)
 
 if (A_IsCompiled) {
 	MyGui.Navigate("index.html")
@@ -54,11 +53,8 @@ pushMsg(type, code, content := "") {
 	MyGui.PostWebMessageAsJson('{"type":"' type '","code":' code ',"content":"' content '"}')
 }
 
-AnimePolishRun(webview, base64) {
-	RunAnimeProcessing(webview, base64, 0.25)
-}
-Anime4xRun(webview, base64) {
-	RunAnimeProcessing(webview, base64, 1)
+CYKSMRun(webview, base64, scale) {
+	RunAnimeProcessing(webview, base64, scale)
 }
 
 RunAnimeProcessing(webview, base64, scale) {
