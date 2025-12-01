@@ -16,9 +16,14 @@
 
 	function updateResolutionText(img, resolutionElement) {
 		if (img && img.naturalWidth && img.naturalHeight) {
+			resolutionElement.removeAttribute("data-i18n")
 			resolutionElement.textContent = `${img.naturalWidth} × ${img.naturalHeight}`
 		} else {
+			resolutionElement.setAttribute("data-i18n", "res_placeholder")
 			resolutionElement.textContent = ""
+			if (window.i18n && window.i18n.updateElement) {
+				window.i18n.updateElement(resolutionElement)
+			}
 		}
 	}
 
@@ -66,8 +71,15 @@
 		false
 	)
 
+	pInput.addEventListener("click", () => {
+		if (state === "ready" || state === "done") {
+			if (window.fullReset) window.fullReset()
+		}
+	})
+
 	browseBtn.addEventListener("click", (e) => {
 		e.preventDefault()
+		e.stopPropagation() // Prevent pInput click
 		filePicker.click()
 	})
 
@@ -177,31 +189,47 @@
 				outputProcess.style.display = "none"
 
 				filePicker.value = null
-				inputResolution.textContent = ""
-				outputResolution.textContent = ""
+				
+				inputResolution.setAttribute("data-i18n", "res_placeholder")
+				if (window.i18n) window.i18n.updateElement(inputResolution)
+				else inputResolution.textContent = ""
+
+				outputResolution.setAttribute("data-i18n", "res_placeholder")
+				if (window.i18n) window.i18n.updateElement(outputResolution)
+				else outputResolution.textContent = ""
 
 				startBtn.classList.add("btn-disabled")
 				startBtn.setAttribute("data-i18n", "start")
-				window.i18n.updateElement(startBtn)
+				if (window.i18n) window.i18n.updateElement(startBtn)
 				break
 			case "ready":
 				inputPreview.style.display = "block"
 				dropHint.style.display = "none"
+				
+				// Clear output (partial reset logic)
+				outputHint.style.display = "flex"
+				outputPreview.style.display = "none"
+				outputProcess.style.display = "none"
+				outputResolution.setAttribute("data-i18n", "res_placeholder")
+				if (window.i18n) window.i18n.updateElement(outputResolution)
+				
 				startBtn.classList.remove("btn-disabled")
+				startBtn.setAttribute("data-i18n", "start")
+				if (window.i18n) window.i18n.updateElement(startBtn)
 				break
 			case "processing":
 				outputHint.style.display = "none"
 				outputProcess.style.display = "flex"
 				startBtn.classList.add("btn-disabled")
 				startBtn.setAttribute("data-i18n", "processing")
-				window.i18n.updateElement(startBtn)
+				if (window.i18n) window.i18n.updateElement(startBtn)
 				break
 			case "done":
 				outputPreview.style.display = "block"
 				outputProcess.style.display = "none"
 				startBtn.classList.remove("btn-disabled")
 				startBtn.setAttribute("data-i18n", "reset")
-				window.i18n.updateElement(startBtn)
+				if (window.i18n) window.i18n.updateElement(startBtn)
 				break
 		}
 	}

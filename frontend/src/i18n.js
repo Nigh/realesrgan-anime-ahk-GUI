@@ -9,6 +9,7 @@ const translations = {
 		keepres: "keep the resolution",
 		drophint: "Drop an image here or",
 		drophintbtn: "browse",
+        res_placeholder: "NULL",
 	},
 	zh: {
 		lang: "中文",
@@ -20,6 +21,7 @@ const translations = {
 		keepres: "保持分辨率",
 		drophint: "拖拽图片至此或",
 		drophintbtn: "浏览文件",
+        res_placeholder: "空",
 	},
 	ja: {
 		lang: "日本語",
@@ -31,6 +33,7 @@ const translations = {
 		keepres: "解像度を維持",
 		drophint: "ここに画像をドロップするか",
 		drophintbtn: "ファイルを選択",
+        res_placeholder: "null",
 	},
 }
 
