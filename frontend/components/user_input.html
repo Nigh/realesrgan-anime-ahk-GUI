@@ -2,7 +2,7 @@
 	function start() {
 		const inputPreview = document.getElementById("input-preview")
 		// validate the preview.src is valid base64
-		const base64Regex = /^data:image\/(?:jpeg|png|webp);base64/
+		const base64Regex = /^data:image\/(?:jpeg|png);base64/
 		if (!base64Regex.test(inputPreview.src)) {
 			window.showMessage("Please select an image first.", "error")
 			return
