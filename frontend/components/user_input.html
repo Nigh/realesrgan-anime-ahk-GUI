@@ -1,10 +1,43 @@
-<div class="flex-none flex flex-col gap-2 w-full items-center pb-4">
+<script>
+	function start() {
+		const inputPreview = document.getElementById("input-preview")
+		// validate the preview.src is valid base64
+		const base64Regex = /^data:image\/(?:jpeg|png|webp);base64/
+		if (!base64Regex.test(inputPreview.src)) {
+			// showMessage("Please select an image first.", "error")
+			return
+		}
+		const scale = document.getElementById("keep-res").checked ? 0.25 : 1
+		ahk.CYKSMRun(inputPreview.src, scale)
+		window.setMainState("processing")
+	}
+	function reset() {
+		window.setMainState("idle")
+	}
+	function mainBtnClick() {
+		switch (window.getState()) {
+			case "ready":
+				start()
+				break
+			case "done":
+				reset()
+				break
+		}
+	}
+</script>
+<div
+	id="user-input"
+	class="flex-none flex flex-col gap-2 w-full items-center pb-4"
+>
 	<button
-		class="btn btn-primary btn-md px-4 w-1/2"
+		id="start-btn"
+		class="btn btn-primary btn-md btn-disabled px-4 w-1/2"
 		data-i18n="start"
+		onclick="mainBtnClick()"
 	></button>
 	<label class="label">
 		<input
+			id="keep-res"
 			type="checkbox"
 			checked="checked"
 			class="checkbox hover:border-primary checked:bg-primary"

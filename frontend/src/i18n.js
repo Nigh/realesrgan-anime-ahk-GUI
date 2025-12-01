@@ -4,6 +4,8 @@ const translations = {
 		title: "CYKSM",
 		brief: "A super resolution tool for anime style pictures",
 		start: "START",
+		processing: "processing",
+		reset: "reset",
 		keepres: "keep the resolution",
 		drophint: "Drop an image here or",
 		drophintbtn: "browse",
@@ -13,6 +15,8 @@ const translations = {
 		title: "次元克赛马",
 		brief: "动漫风格图片超分辨率工具",
 		start: "开始",
+		processing: "处理中",
+		reset: "重置",
 		keepres: "保持分辨率",
 		drophint: "拖拽图片至此或",
 		drophintbtn: "浏览文件",
@@ -22,6 +26,8 @@ const translations = {
 		title: "次元ケイザーマ",
 		brief: "アニメ風画像用超解像ツール",
 		start: "開始",
+		processing: "処理中",
+		reset: "リセット",
 		keepres: "解像度を維持",
 		drophint: "ここに画像をドロップするか",
 		drophintbtn: "ファイルを選択",
@@ -150,30 +156,28 @@ class I18n {
 		return text
 	}
 
+	updateElement(elem) {
+		const key = elem.getAttribute("data-i18n")
+		const variables = JSON.parse(
+			elem.getAttribute("data-i18n-vars") || "{}"
+		)
+
+		// 处理不同类型的元素
+		if (elem.placeholder !== undefined) {
+			elem.placeholder = this.t(key, variables)
+		} else if (elem.value !== undefined && elem.type !== "submit") {
+			elem.value = this.t(key, variables)
+		} else {
+			elem.textContent = this.t(key, variables)
+		}
+	}
 	// 更新页面所有文本
 	updatePage() {
-		document.documentElement.lang = this.currentLang;
+		document.documentElement.lang = this.currentLang
 		// 找到所有带有 data-i18n 属性的元素
 		const elements = document.querySelectorAll("[data-i18n]")
 
-		elements.forEach((element) => {
-			const key = element.getAttribute("data-i18n")
-			const variables = JSON.parse(
-				element.getAttribute("data-i18n-vars") || "{}"
-			)
-
-			// 处理不同类型的元素
-			if (element.placeholder !== undefined) {
-				element.placeholder = this.t(key, variables)
-			} else if (
-				element.value !== undefined &&
-				element.type !== "submit"
-			) {
-				element.value = this.t(key, variables)
-			} else {
-				element.textContent = this.t(key, variables)
-			}
-		})
+		elements.forEach((element) => this.updateElement(element))
 
 		// 更新语言显示
 		this.updateLanguageDisplay()

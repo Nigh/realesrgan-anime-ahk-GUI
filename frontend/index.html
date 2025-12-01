@@ -8,6 +8,17 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>ahk-webview-template</title>
 		<script>
+			document.addEventListener("contextmenu", (event) => {
+				event.preventDefault()
+			})
+			document.addEventListener("keydown", (event) => {
+				if (
+					event.key === "F5" ||
+					(event.ctrlKey && event.key === "r")
+				) {
+					event.preventDefault()
+				}
+			})
 			window.chrome.webview.addEventListener("message", onAhkMsg)
 			const cmdFromAhk = {
 				DragWindowMouseUp: () => {
@@ -45,6 +56,7 @@
 		</div>
 		<script type="module">
 			import "./src/app.js"
+			import "./src/main.js"
 		</script>
 	</body>
 </html>

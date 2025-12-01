@@ -1,4 +1,3 @@
-﻿
 SetWorkingDir(A_ScriptDir)
 #SingleInstance force
 #include meta.ahk
@@ -27,66 +26,21 @@ pGDI := Gdip_Startup()
 
 #include anime4x.ahk
 
-; mygui:=Gui("-AlwaysOnTop -Owner -DpiScale")
-; myGui.OnEvent("Close", myGui_Close)
-; myGui.OnEvent("DropFiles", mygui_DropFiles)
-; mygui.SetFont("s32 Q5", "Meiryo")
-; mygui.Add("Text","x20 y10 Section","次元克赛马")
-; mygui.SetFont("s10 Q5", "Meiryo")
-; mygui.Add("Text","x+20 y+-52","v" . version)
-; mygui.Add("Link","xp y+0",'bilibili: <a href="https://space.bilibili.com/895523">TecNico</a>')
-; mygui.Add("Link","xp y+0",'GitHub: <a href="https://github.com/Nigh">xianii</a>')
-; mygui.Add("Text","x50 yp","二次元反向马赛克工具")
-
-; mygui.SetFont("s10 Q5 Bold", "Meiryo")
-; ori_label:=mygui.Add("Text","x20 y+10 w400 h20 center", "原图")
-; new_label:=mygui.Add("Text","x+10 yp w400 h20 center", "转换后")
-; ori_pic:=mygui.Add("Picture", "x20 y+0 w400 h400 0xE 0x200 0x800000 -0x40")
-; new_pic:=mygui.Add("Picture", "x+10 w400 h400 0xE 0x200 0x800000 -0x40")
-; ori_size:=mygui.Add("Text","x20 y+0 w400 h20 center", "NULL")
-; new_size:=mygui.Add("Text","x+10 yp w400 h20 center", "NULL")
-
-; runBtn:=mygui.Add("Button", "x20 y+10 w810 r3 Disabled", "转换")
-; runBtn.OnEvent("Click", generate)
-
-; generate(btn, *) {
-; 	btn.Enabled:=false
-; 	btn.Text := "转换中"
-; 	ends(){
-; 		global new_pic, ori_pic, new_size
-; 		btn.Text:="转换"
-; 		Gdip_GetImageDimensions(anime4x.output_bitmap, &W, &H)
-; 		new_size.Text := W "x" H
-; 		mygui_ctrl_show_pic(new_pic, anime4x.output_bitmap)
-; 		btn.gui.Opt("+OwnDialogs")
-; 		MsgBox("转换完成，已保存为`n" anime4x.outputfile)
-; 	}
-; 	proc() {
-; 		if(StrLen(btn.Text)<19) {
-; 			btn.Text:="< " btn.Text " >"
-; 		} else {
-; 			btn.Text:="转换中"
-; 		}
-; 	}
-; 	anime4x.callback(proc)
-; 	anime4x.after(ends)
-; 	anime4x.go()
-; }
+scriptBusy := false
 
 WebViewSettings := {}
 if (A_IsCompiled) {
 	WebViewCtrl.CreateFileFromResource("64bit\WebView2Loader.dll", WebViewCtrl.TempDir)
-    WebViewSettings := {DllPath: WebViewCtrl.TempDir "\64bit\WebView2Loader.dll"}
+	WebViewSettings := { DllPath: WebViewCtrl.TempDir "\64bit\WebView2Loader.dll" }
 }
 
-MyGui := WebViewGui("+Resize +MinSize800x600",,, WebViewSettings)
+MyGui := WebViewGui("+Resize +MinSize800x600", , , WebViewSettings)
 MyGui.OnEvent("Close", mygui_Close)
 
 MyGui.AddCallbackToScript("Visit", WebviewVisit)
-; MyGui.AddCallbackToScript("Msg", WebviewMsg)
-; MyGui.AddCallbackToScript("DragStart", dragStart)
+MyGui.AddCallbackToScript("CYKSMRun", CYKSMRun)
 
-if(A_IsCompiled) {
+if (A_IsCompiled) {
 	MyGui.Navigate("index.html")
 } else {
 	MyGui.Navigate("http://localhost:5173")
@@ -95,95 +49,58 @@ if(A_IsCompiled) {
 MyGui.Show("w820 h600")
 Return
 
+pushMsg(type, code, content := "") {
+	MyGui.PostWebMessageAsJson('{"type":"' type '","code":' code ',"content":"' content '"}')
+}
+
+CYKSMRun(webview, base64, scale) {
+	RunAnimeProcessing(webview, base64, scale)
+}
+
+RunAnimeProcessing(webview, base64, scale) {
+	if (scriptBusy) {
+		pushMsg("state", 2)
+		Return
+	}
+	worker(*) {
+		if FileExist(A_Temp '\CYKSM\temp_input.png') {
+			FileDelete(A_Temp '\CYKSM\temp_input.png')
+		}
+		if FileExist(A_Temp '\CYKSM\temp_output.png') {
+			FileDelete(A_Temp '\CYKSM\temp_output.png')
+		}
+
+		base64 := RegExReplace(base64, "(?i)^.*?base64,")
+		pBitmap := Gdip_BitmapFromBase64(&base64)
+		input_error := Gdip_SaveBitmapToFile(pBitmap, A_Temp '\CYKSM\temp_input.png')
+		if (input_error < 0) {
+			pushMsg("error", input_error, "GDIp save bitmap to file failed")
+			return
+		}
+
+		anime4x.inputpath(A_Temp '\CYKSM\temp_input.png')
+		anime4x.outputpath(A_Temp '\CYKSM\temp_output.png')
+		pushMsg("state", 1)
+		global scriptBusy := true
+		result := anime4x.go(scale)
+		scriptBusy := false
+		if (result == 0) {
+			pushMsg("result", result, anime4x.output_base64)
+		} else {
+			pushMsg("error", result, "realesrgan error")
+		}
+	}
+	SetTimer(worker, -1)
+}
+
 WebviewVisit(webview, msg) {
 	Run(msg)
 }
 
-; mygui_set_pic_size(picW, picH)
-; {
-; 	global Screen_Width, Screen_Height, ori_pic, new_pic, ori_label, new_label, ori_size, new_size, runBtn, gui_margin
-
-; 	ratio := picW / picH
-
-; 	minW:=DPIScaled(400)
-; 	minH:=DPIScaled(400)
-; 	maxW:=0.4*Screen_Width
-; 	maxH:=0.6*Screen_Height
-
-; 	percent := 1
-; 	percent := Min(percent, maxH / picH)
-; 	percent := Min(percent, maxW / picW)
-; 	percent *= Min(maxW / (picH * percent * ratio), 1)
-
-; 	ctrlH := Round(picH * percent) + 0
-; 	ctrlW := Round(ctrlH * ratio) + 0
-
-; 	ori_label.Move(gui_margin, , ctrlW, 20)
-; 	new_label.Move(gui_margin+gui_margin+ctrlW, , ctrlW, 20)
-; 	ori_pic.Move(gui_margin, , ctrlW, ctrlH)
-; 	new_pic.Move(gui_margin+gui_margin+ctrlW, , ctrlW, ctrlH)
-; 	ori_pic.GetPos(,&y)
-; 	ori_size.Move(gui_margin, y+ctrlH, ctrlW, 20)
-; 	new_size.Move(gui_margin+gui_margin+ctrlW, y+ctrlH, ctrlW, 20)
-
-; 	runBtn.Move(gui_margin, y+ctrlH+gui_margin+20, 2*ctrlW+gui_margin)
-; 	new_pic.gui.Show("AutoSize xCenter yCenter")
-; 	ori_label.Redraw()
-; 	new_label.Redraw()
-; 	new_pic.Redraw()
-; 	ori_pic.Redraw()
-; 	ori_size.Redraw()
-; 	new_size.Redraw()
-; 	Return percent
-; }
-
-; mygui_ctrl_show_pic(GuiCtrlObj, pBitmap)
-; {
-; 	Gdip_GetImageDimensions(pBitmap, &W, &H)
-; 	percent := mygui_set_pic_size(W, H)
-; 	picW:=W*percent
-; 	picH:=H*percent
-; 	; GuiCtrlObj.GetPos(,, &ctrlW, &ctrlH)
-; 	pBitmapShow := Gdip_CreateBitmap(picW, picH)
-; 	G := Gdip_GraphicsFromImage(pBitmapShow)
-; 	Gdip_SetSmoothingMode(G, 4)
-; 	Gdip_SetInterpolationMode(G, 7)
-; 	Gdip_DrawImage(G, pBitmap, 0, 0, picW, picH)
-; 	hBitmapShow := Gdip_CreateHBITMAPFromBitmap(pBitmapShow)
-; 	SetImage(GuiCtrlObj.hwnd, hBitmapShow)
-; 	Gdip_DeleteGraphics(G), Gdip_DisposeImage(pBitmapShow), DeleteObject(hBitmapShow)
-; 	Gdip_DisposeImage(pBitmap)
-; }
-
-; mygui_DropFiles(GuiObj, GuiCtrlObj, FileArray, X, Y) {
-; 	global ori_pic, new_pic, ori_size, new_size, runBtn
-; 	GuiObj.Opt("+OwnDialogs")
-; 	if(FileArray.Length>1) {
-; 		MsgBox "一次只能拖进一个文件哦"
-; 		Return
-; 	}
-; 	SplitPath(FileArray[1],,,&Ext)
-	
-; 	if(anime4x.inputpath(FileArray[1])<=0||!RegExMatch(Ext, "i)(jpg|jpeg|png|jfif)$")) {
-; 		MsgBox "无效的图片文件"
-; 	} else {
-; 		runBtn.Enabled:=True
-; 		Gdip_GetImageDimensions(anime4x.input_bitmap, &W, &H)
-; 		mygui_ctrl_show_pic(ori_pic ,anime4x.input_bitmap)
-; 		ori_size.Text := W "x" H
-; 		new_size.Text := "NULL"
-		
-; 		SetImage(new_pic.hwnd, 0)
-		
-; 		SplitPath(FileArray[1],,,,&name)
-; 		anime4x.outputpath(A_ScriptDir "\" name "_4x.png")
-; 	}
-; }
-
 mygui_Close(*) {
 	trueExit(0, 0)
 }
-trueExit(ExitReason, ExitCode){
+trueExit(ExitReason, ExitCode) {
 	ExitApp
 }
 
@@ -196,5 +113,5 @@ trueExit(ExitReason, ExitCode){
 
 ;@Ahk2Exe-IgnoreBegin
 ; For dev
-F6::ExitApp(5173)
+F6:: ExitApp(5173)
 ;@Ahk2Exe-IgnoreEnd

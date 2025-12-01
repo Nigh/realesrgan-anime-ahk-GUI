@@ -1,168 +1,77 @@
 <div class="flex-1 min-h-0 flex flex-row h-full px-4 pt-4 w-full">
-	<div
-		id="p-input"
-		class="flex-1 min-h-0 h-full border-2 rounded-md p-4 flex items-center justify-center flex-col text-center"
-	>
-		<input
-			id="file-picker"
-			type="file"
-			accept="image/*"
-			style="display: none"
-		/>
+	<div class="flex flex-1 flex-col text-center">
 		<div
-			id="drop-hint"
-			class="w-full h-full flex flex-col items-center justify-center gap-2"
+			id="p-input"
+			class="flex-1 min-h-0 h-full border-2 rounded-md p-4 flex items-center justify-center flex-col text-center"
 		>
-			<load src="components/icon_upload.html" />
-			<div>
-				<span data-i18n="drophint"></span>
-				<button
-					id="browse-btn"
-					class="btn btn-accent btn-xs"
-					data-i18n="drophintbtn"
-				></button>
+			<input
+				id="file-picker"
+				type="file"
+				accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+				style="display: none"
+			/>
+			<div
+				id="drop-hint"
+				class="w-full h-full flex flex-col items-center justify-center gap-2"
+			>
+				<load src="components/icon_upload.html" />
+				<div>
+					<span data-i18n="drophint"></span>
+					<button
+						id="browse-btn"
+						class="btn btn-accent btn-xs"
+						data-i18n="drophintbtn"
+					></button>
+				</div>
 			</div>
+			<img
+				id="input-preview"
+				src=""
+				alt="Preview"
+				style="
+					width: 100%;
+					height: 100%;
+					display: none;
+					object-fit: contain;
+				"
+			/>
 		</div>
-		<img
-			id="preview"
-			src=""
-			alt="Preview"
-			style="
-				max-width: 100%;
-				max-height: 100%;
-				display: none;
-				object-fit: scale-down;
-			"
-		/>
+		<div><span id="input-resolution"></span></div>
 	</div>
 	<div class="flex-none divider divider-horizontal"></div>
-	<div
-		id="p-output"
-		class="flex-1 min-h-0 h-full border-2 rounded-md p-4 flex items-center justify-center flex-col text-center"
-	>
-		<!-- output preview image -->
-
+	<div class="flex flex-1 flex-col text-center">
 		<div
-			id="output-hint"
-			class="w-full h-full flex flex-col items-center justify-center gap-2"
+			id="p-output"
+			class="flex-1 min-h-0 h-full border-2 rounded-md p-4 flex items-center justify-center flex-col text-center"
 		>
-			<load src="components/icon_picture.html" />
+			<!-- output preview image -->
+
+			<div
+				id="output-hint"
+				class="w-full h-full flex flex-col items-center justify-center gap-2"
+			>
+				<load src="components/icon_picture.html" />
+			</div>
+			<div
+				id="output-process"
+				class="w-full h-full hidden flex-col items-center justify-center"
+			>
+				<span
+					class="loading loading-dots text-primary loading-xl"
+				></span>
+			</div>
+			<img
+				id="output-preview"
+				src=""
+				alt="Output Preview"
+				style="
+					width: 100%;
+					height: 100%;
+					display: none;
+					object-fit: contain;
+				"
+			/>
 		</div>
-		<img
-			id="output-preview"
-			src=""
-			alt="Output Preview"
-			style="
-				max-width: 100%;
-				max-height: 100%;
-				display: none;
-				object-fit: scale-down;
-			"
-		/>
+		<div><span id="output-resolution"></span></div>
 	</div>
 </div>
-<script>
-	;(function () {
-		const pInput = document.getElementById("p-input")
-		const preview = document.getElementById("preview")
-		const dropHint = document.getElementById("drop-hint")
-		const outputHint = document.getElementById("output-hint")
-		const filePicker = document.getElementById("file-picker")
-		const browseBtn = document.getElementById("browse-btn")
-		const pOutput = document.getElementById("p-output")
-		const outputPreview = document.getElementById("output-preview")
-
-		function prevent(e) {
-			e.preventDefault()
-			e.stopPropagation()
-		}
-
-		;["dragenter", "dragover", "dragleave", "drop"].forEach((evt) => {
-			pInput.addEventListener(evt, prevent, false)
-		})
-
-		pInput.addEventListener(
-			"dragover",
-			() => {
-				pInput.classList.add("bg-accent/50", "border-accent")
-			},
-			false
-		)
-
-		pInput.addEventListener(
-			"dragleave",
-			() => {
-				pInput.classList.remove("bg-accent/50", "border-accent")
-			},
-			false
-		)
-
-		pInput.addEventListener(
-			"drop",
-			(e) => {
-				pInput.classList.remove("bg-accent/50", "border-accent")
-				const dt = e.dataTransfer
-				if (!dt || !dt.files || dt.files.length === 0) return
-				handleFiles(dt.files)
-			},
-			false
-		)
-
-		browseBtn.addEventListener("click", (e) => {
-			e.preventDefault()
-			filePicker.click()
-		})
-
-		filePicker.addEventListener("change", (e) => {
-			if (!e.target.files) return
-			handleFiles(e.target.files)
-		})
-
-		function handleFiles(files) {
-			const file = Array.from(files).find(
-				(f) => f.type && f.type.startsWith("image/")
-			)
-			if (!file) return
-			const reader = new FileReader()
-			reader.onload = function (ev) {
-				preview.src = ev.target.result
-				preview.style.display = "block"
-				dropHint.style.display = "none"
-			}
-			reader.readAsDataURL(file)
-			setOutputImage(file)
-		}
-
-		// Sets an image on a target div's preview <img> by id.
-		// Accepts a File/Blob or a string (data URL or normal URL).
-		window.setPictureOnDiv = function (imgElementId, source) {
-			const imgEl = document.getElementById(imgElementId)
-			if (!imgEl) return
-			function applySrc(src) {
-				imgEl.src = src
-				imgEl.style.display = "block"
-				// hide sibling hints if any
-				const parent = imgEl.parentElement
-				if (parent) {
-					const hint = parent.querySelector("#drop-hint")
-					if (hint) hint.style.display = "none"
-				}
-			}
-			if (source instanceof Blob || source instanceof File) {
-				const r = new FileReader()
-				r.onload = (ev) => applySrc(ev.target.result)
-				r.readAsDataURL(source)
-			} else if (typeof source === "string") {
-				applySrc(source)
-			}
-		}
-
-		// Convenience: set image into the p-output area
-		window.setOutputImage = function (source) {
-			// uses the output-preview img inside #p-output
-			outputHint.style.display = "none"
-			outputPreview.style.display = "block"
-			window.setPictureOnDiv("output-preview", source)
-		}
-	})()
-</script>
