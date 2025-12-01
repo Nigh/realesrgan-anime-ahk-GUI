@@ -97,14 +97,14 @@
 	})
 
 	function handleFiles(files) {
-		const ALLOWED_MIMES = ["image/jpeg", "image/png", "image/webp"]
+		const ALLOWED_MIMES = ["image/jpeg", "image/png"]
 
 		const file = Array.from(files).find((f) =>
 			ALLOWED_MIMES.includes(f.type)
 		)
 		if (!file) {
 			window.showMessage(
-				"File rejected: Please select a JPEG, PNG, or WebP image.",
+				"File rejected: Please select a JPEG, or PNG image.",
 				"error"
 			)
 			return
