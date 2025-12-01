@@ -87,6 +87,8 @@ Anime4xRun(webview, base64) {
 		scriptBusy := false
 		if(result == 0) {
 			pushMsg("result", result, anime4x.output_base64)
+		} else {
+			pushMsg("error", result, "realesrgan error")
 		}
 	}
 	SetTimer(worker, -1)
