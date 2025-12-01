@@ -11,8 +11,11 @@
 		ahk.CYKSMRun(inputPreview.src, scale)
 		window.setMainState("processing")
 	}
-	function reset() {
+	function fullReset() {
 		window.setMainState("idle")
+	}
+	function softReset() {
+		window.setMainState("ready")
 	}
 	function mainBtnClick() {
 		switch (window.getState()) {
@@ -20,7 +23,7 @@
 				start()
 				break
 			case "done":
-				reset()
+				softReset()
 				break
 		}
 	}
