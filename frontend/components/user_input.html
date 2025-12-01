@@ -4,7 +4,7 @@
 		// validate the preview.src is valid base64
 		const base64Regex = /^data:image\/(?:jpeg|png|webp);base64/
 		if (!base64Regex.test(inputPreview.src)) {
-			// showMessage("Please select an image first.", "error")
+			window.showMessage("Please select an image first.", "error")
 			return
 		}
 		const scale = document.getElementById("keep-res").checked ? 0.25 : 1
