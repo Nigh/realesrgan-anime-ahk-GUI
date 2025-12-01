@@ -84,10 +84,10 @@
 			ALLOWED_MIMES.includes(f.type)
 		)
 		if (!file) {
-			// showMessage(
-			// 	"File rejected: Please select a JPEG, PNG, or WebP image.",
-			// 	"error"
-			// )
+			window.showMessage(
+				"File rejected: Please select a JPEG, PNG, or WebP image.",
+				"error"
+			)
 			return
 		}
 		const reader = new FileReader()
@@ -126,6 +126,40 @@
 		window.setPictureOnDiv("output-preview", source)
 		window.setMainState("done")
 	}
+	window.showMessage = function (message, type = "info") {
+		let container = document.getElementById("toast-container")
+		if (!container) {
+			container = document.createElement("div")
+			container.id = "toast-container"
+			container.className = "toast toast-top toast-end z-50"
+			document.body.appendChild(container)
+		}
+
+		const alertDiv = document.createElement("div")
+		const alertClass =
+			type === "error"
+				? "alert-error"
+				: type === "success"
+				? "alert-success"
+				: type === "warning"
+				? "alert-warning"
+				: "alert-info"
+		alertDiv.className = `alert ${alertClass}`
+
+		const span = document.createElement("span")
+		span.textContent = message
+		alertDiv.appendChild(span)
+
+		container.appendChild(alertDiv)
+
+		setTimeout(() => {
+			alertDiv.remove()
+			if (container.children.length === 0) {
+				container.remove()
+			}
+		}, 3000)
+	}
+
 	window.setMainState = function (next) {
 		// idle -> ready -> processing -> done
 		// error -> idle
@@ -145,7 +179,7 @@
 				filePicker.value = null
 				inputResolution.textContent = ""
 				outputResolution.textContent = ""
-				
+
 				startBtn.classList.add("btn-disabled")
 				startBtn.setAttribute("data-i18n", "start")
 				window.i18n.updateElement(startBtn)
@@ -181,6 +215,13 @@ function onMsg(Msg) {
 					window.setOutputImage(Msg.data.content)
 					window.setMainState("done")
 				}
+				break
+			case "error":
+				window.showMessage(
+					`Error ${Msg.data.code}: ${Msg.data.content}`,
+					"error"
+				)
+				window.setMainState("idle")
 				break
 		}
 	}
