@@ -15,7 +15,7 @@ Class anime4x
 		this.outputfile := outputfile
 	}
 
-	static go() {
+	static go(scale := 1) {
 		if not FileExist(this.inputfile) {
 			return
 		}
@@ -26,6 +26,27 @@ Class anime4x
 		if result != 0 {
 			return result
 		}
+
+		if (scale < 1) {
+			pBitmap := Gdip_CreateBitmapFromFile(this.outputfile)
+			Width := Gdip_GetImageWidth(pBitmap)
+			Height := Gdip_GetImageHeight(pBitmap)
+
+			NewWidth := Round(Width * scale)
+			NewHeight := Round(Height * scale)
+
+			pBitmapNew := Gdip_CreateBitmap(NewWidth, NewHeight)
+			G := Gdip_GraphicsFromImage(pBitmapNew)
+			Gdip_SetInterpolationMode(G, 7)
+			Gdip_DrawImage(G, pBitmap, 0, 0, NewWidth, NewHeight, 0, 0, Width, Height)
+			Gdip_DisposeImage(pBitmap)
+			Gdip_DeleteGraphics(G)
+
+			FileDelete this.outputfile
+			Gdip_SaveBitmapToFile(pBitmapNew, this.outputfile)
+			Gdip_DisposeImage(pBitmapNew)
+		}
+
 		; this.output_bitmap := Gdip_CreateBitmapFromFile(this.outputfile)
 		Gdip_DisposeImage(this.input_bitmap)
 		EncodedString := FileToBase64(anime4x.outputfile)
@@ -50,62 +71,62 @@ Class anime4x
 ; =================================================================
 FileToBase64(FilePath)
 {
-    local Stream, XML, Node, BinaryData, Base64Str
-    
-    ; 1. Read the binary file data using ADODB.Stream
-    Stream := ComObject("ADODB.Stream")
-    if !IsObject(Stream)
-    {
-        ErrorLevel := 1 ; COM object creation failed
-        return ""
-    }
-    
-    Stream.Type := 1 ; 1 = adTypeBinary
-    Stream.Open
-    
-    ; Try to load the file into the stream
-    try
-    {
-        Stream.LoadFromFile(FilePath)
-        Stream.Position := 0 ; Rewind to the beginning
-    }
-    catch
-    {
-        ErrorLevel := 2 ; Failed to load file
-        Stream.Close()
-        return ""
-    }
+	local Stream, XML, Node, BinaryData, Base64Str
 
-    ; Get the binary data from the stream
-    BinaryData := Stream.Read(-1) ; -1 = adReadAll
-    Stream.Close()
-    
-    ; 2. Use MSXML2.DOMDocument for Base64 Encoding
-    XML := ComObject("MSXML2.DOMDocument")
-    if !IsObject(XML)
-    {
-        ErrorLevel := 3 ; COM object creation failed
-        return ""
-    }
-    
-    ; Create a temporary XML node to hold the binary data
-    Node := XML.createElement("Base64Data")
-    
-    ; Append the binary data directly to the node (this is where the encoding happens)
-    try
-    {
-        Node.dataType := "bin.base64"
-        Node.nodeTypedValue := BinaryData
-    }
-    catch
-    {
-        ErrorLevel := 4 ; Encoding failed
-        return ""
-    }
-    
-    ; Extract the text content, which is the Base64 string
-    Base64Str := Node.text
-    
-    ErrorLevel := 0
-    return Base64Str
+	; 1. Read the binary file data using ADODB.Stream
+	Stream := ComObject("ADODB.Stream")
+	if !IsObject(Stream)
+	{
+		ErrorLevel := 1 ; COM object creation failed
+		return ""
+	}
+
+	Stream.Type := 1 ; 1 = adTypeBinary
+	Stream.Open
+
+	; Try to load the file into the stream
+	try
+	{
+		Stream.LoadFromFile(FilePath)
+		Stream.Position := 0 ; Rewind to the beginning
+	}
+	catch
+	{
+		ErrorLevel := 2 ; Failed to load file
+		Stream.Close()
+		return ""
+	}
+
+	; Get the binary data from the stream
+	BinaryData := Stream.Read(-1) ; -1 = adReadAll
+	Stream.Close()
+
+	; 2. Use MSXML2.DOMDocument for Base64 Encoding
+	XML := ComObject("MSXML2.DOMDocument")
+	if !IsObject(XML)
+	{
+		ErrorLevel := 3 ; COM object creation failed
+		return ""
+	}
+
+	; Create a temporary XML node to hold the binary data
+	Node := XML.createElement("Base64Data")
+
+	; Append the binary data directly to the node (this is where the encoding happens)
+	try
+	{
+		Node.dataType := "bin.base64"
+		Node.nodeTypedValue := BinaryData
+	}
+	catch
+	{
+		ErrorLevel := 4 ; Encoding failed
+		return ""
+	}
+
+	; Extract the text content, which is the Base64 string
+	Base64Str := Node.text
+
+	ErrorLevel := 0
+	return Base64Str
 }

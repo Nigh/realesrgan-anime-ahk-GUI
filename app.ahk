@@ -1,4 +1,3 @@
-﻿
 SetWorkingDir(A_ScriptDir)
 #SingleInstance force
 #include meta.ahk
@@ -32,17 +31,17 @@ scriptBusy := false
 WebViewSettings := {}
 if (A_IsCompiled) {
 	WebViewCtrl.CreateFileFromResource("64bit\WebView2Loader.dll", WebViewCtrl.TempDir)
-    WebViewSettings := {DllPath: WebViewCtrl.TempDir "\64bit\WebView2Loader.dll"}
+	WebViewSettings := { DllPath: WebViewCtrl.TempDir "\64bit\WebView2Loader.dll" }
 }
 
-MyGui := WebViewGui("+Resize +MinSize800x600",,, WebViewSettings)
+MyGui := WebViewGui("+Resize +MinSize800x600", , , WebViewSettings)
 MyGui.OnEvent("Close", mygui_Close)
 
 MyGui.AddCallbackToScript("Visit", WebviewVisit)
 MyGui.AddCallbackToScript("anime4x", Anime4xRun)
 MyGui.AddCallbackToScript("animePolish", AnimePolishRun)
 
-if(A_IsCompiled) {
+if (A_IsCompiled) {
 	MyGui.Navigate("index.html")
 } else {
 	MyGui.Navigate("http://localhost:5173")
@@ -51,15 +50,19 @@ if(A_IsCompiled) {
 MyGui.Show("w820 h600")
 Return
 
-pushMsg(type, code, content:="") {
+pushMsg(type, code, content := "") {
 	MyGui.PostWebMessageAsJson('{"type":"' type '","code":' code ',"content":"' content '"}')
 }
 
 AnimePolishRun(webview, base64) {
-
+	RunAnimeProcessing(webview, base64, 0.25)
 }
 Anime4xRun(webview, base64) {
-	if(scriptBusy) {
+	RunAnimeProcessing(webview, base64, 1)
+}
+
+RunAnimeProcessing(webview, base64, scale) {
+	if (scriptBusy) {
 		pushMsg("state", 2)
 		Return
 	}
@@ -70,22 +73,22 @@ Anime4xRun(webview, base64) {
 		if FileExist(A_Temp '\CYKSM\temp_output.png') {
 			FileDelete(A_Temp '\CYKSM\temp_output.png')
 		}
-		
+
 		base64 := RegExReplace(base64, "(?i)^.*?base64,")
 		pBitmap := Gdip_BitmapFromBase64(&base64)
 		input_error := Gdip_SaveBitmapToFile(pBitmap, A_Temp '\CYKSM\temp_input.png')
-		if(input_error < 0) {
+		if (input_error < 0) {
 			pushMsg("error", input_error, "GDIp save bitmap to file failed")
 			return
 		}
-		
+
 		anime4x.inputpath(A_Temp '\CYKSM\temp_input.png')
 		anime4x.outputpath(A_Temp '\CYKSM\temp_output.png')
 		pushMsg("state", 1)
 		global scriptBusy := true
-		result := anime4x.go()
+		result := anime4x.go(scale)
 		scriptBusy := false
-		if(result == 0) {
+		if (result == 0) {
 			pushMsg("result", result, anime4x.output_base64)
 		} else {
 			pushMsg("error", result, "realesrgan error")
@@ -101,7 +104,7 @@ WebviewVisit(webview, msg) {
 mygui_Close(*) {
 	trueExit(0, 0)
 }
-trueExit(ExitReason, ExitCode){
+trueExit(ExitReason, ExitCode) {
 	ExitApp
 }
 
@@ -114,5 +117,5 @@ trueExit(ExitReason, ExitCode){
 
 ;@Ahk2Exe-IgnoreBegin
 ; For dev
-F6::ExitApp(5173)
+F6:: ExitApp(5173)
 ;@Ahk2Exe-IgnoreEnd
