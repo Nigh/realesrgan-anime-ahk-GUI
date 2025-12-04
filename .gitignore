@@ -5,6 +5,8 @@ resource.ahk
 .vscode
 dist/
 *.ini
+!realesrgan-ncnn-vulkan.exe
+!updater.exe
 
 # Windows image file caches
 Thumbs.db
