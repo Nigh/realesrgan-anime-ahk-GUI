@@ -107,8 +107,8 @@ updateReady() {
 							Download(mirrorList[updateMirror] . downloadUrl . downloadFilename, "./" . downloadFilename)
 							MsgBox("Download finished`nProgram will restart now", , "T3")
 							todayUpdated()
-							FileInstall("updater.exe", "updater.exe", 1)
-							Run("updater.exe")
+							FileInstall("bin/updater.exe", "updater.exe", 1)
+							Run("updater.exe `"" downloadFilename "`" `"" binaryFilename "`"")
 							ExitApp
 						} catch as e {
 							TrayTip "An exception was thrown!`nSpecifically: " . e.Message, "upgrade failed", 0x3

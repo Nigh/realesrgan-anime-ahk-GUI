@@ -14,9 +14,12 @@
     "dev": "node scripts/dev.js",
     "dev:watch": "set AHK_WATCH=1 && node scripts/dev.js",
     "build": "npm run build:front && npm run build:ahk",
-    "preview": "start /B app.exe"
+    "preview": "start /B app.exe",
+    "predist": "npm run build",
+    "dist": "node scripts/dist.js"
   },
   "devDependencies": {
+    "adm-zip": "^0.5.16",
     "ahk64": "^2.0.19",
     "chokidar": "^4.0.3",
     "daisyui": "^5.1.29",
