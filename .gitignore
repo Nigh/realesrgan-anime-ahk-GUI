@@ -23,6 +23,7 @@ $RECYCLE.BIN/
 
 updater.h
 compile_prop.ahk
+version.txt
 
 # Logs
 logs
@@ -35,6 +36,7 @@ lerna-debug.log*
 
 node_modules
 dist
+release
 dist-ssr
 *.local
 

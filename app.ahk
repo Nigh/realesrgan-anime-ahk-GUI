@@ -1,10 +1,6 @@
 SetWorkingDir(A_ScriptDir)
 #SingleInstance force
 #include meta.ahk
-;@Ahk2Exe-SetName %appName%
-;@Ahk2Exe-SetVersion %version%
-;@Ahk2Exe-SetMainIcon icon.ico
-;@Ahk2Exe-ExeName %appName%
 
 #include prod.ahk
 
@@ -110,6 +106,7 @@ trueExit(ExitReason, ExitCode) {
 #include tray.ahk
 
 #Include *i resource.ahk
+#include *i compile_prop.ahk 
 
 ;@Ahk2Exe-IgnoreBegin
 ; For dev
