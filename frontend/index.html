@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="icon" type="image/svg+xml" href="assets/vite.svg" />
+		<link rel="stylesheet" href="./src/app.css" />
+		<link rel="stylesheet" href="./src/style.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ahk-webview-template</title>
+		<script>
+			document.addEventListener("contextmenu", (event) => {
+				event.preventDefault()
+			})
+			document.addEventListener("keydown", (event) => {
+				if (
+					event.key === "F5" ||
+					(event.ctrlKey && event.key === "r")
+				) {
+					event.preventDefault()
+				}
+			})
+			window.chrome.webview.addEventListener("message", onAhkMsg)
+			const cmdFromAhk = {
+				DragWindowMouseUp: () => {
+					alert("DragWindowMouseUp")
+				},
+			}
+			function onAhkMsg(Msg) {
+				console.log(Msg)
+				if (
+					Msg.data &&
+					typeof Msg.data == "object" &&
+					Msg.data.type.length > 0
+				) {
+					switch (Msg.data.type) {
+						case "cmd":
+							if (cmdFromAhk[Msg.data.content])
+								cmdFromAhk[Msg.data.content]()
+							break
+					}
+				}
+			}
+		</script>
+	</head>
+	<body
+		class="overflow-hidden h-screen w-screen relative select-none flex-1 min-h-0"
+	>
+		<div
+			id="pages"
+			class="flex flex-col h-full w-full transition-transform duration-500 ease-in-out"
+		>
+			<load src="./components/nav.html" />
+			<load src="./components/main.html" />
+			<div class="divider"></div>
+			<load src="./components/user_input.html" />
+		</div>
+		<script type="module">
+			import "./src/app.js"
+			import "./src/main.js"
+		</script>
+	</body>
+</html>

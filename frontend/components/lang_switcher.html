@@ -1,0 +1,32 @@
+<div class="dropdown dropdown-hover dropdown-end m-1">
+	<div tabindex="0" class="m-1">lang:<span class="ml-1 font-bold badge badge-outline badge-secondary" data-i18n="lang"></span></div>
+	<ul
+		tabindex="-1"
+		class="dropdown-content menu border-2 bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm gap-2"
+	>
+		<li>
+			<button
+				class="btn btn-secondary btn-outline btn-xs"
+				onclick="i18n.setLanguage('en')"
+			>
+				English
+			</button>
+		</li>
+		<li>
+			<button
+				class="btn btn-secondary btn-outline btn-xs"
+				onclick="i18n.setLanguage('zh')"
+			>
+				中文
+			</button>
+		</li>
+		<li>
+			<button
+				class="btn btn-secondary btn-outline btn-xs"
+				onclick="i18n.setLanguage('ja')"
+			>
+				日本語
+			</button>
+		</li>
+	</ul>
+</div>

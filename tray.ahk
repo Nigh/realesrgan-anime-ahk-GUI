@@ -10,7 +10,7 @@ gotoWebpage_maker(page)
 
 setTray()
 {
-	global version, trueExit
+	global version
 	trayExit(*){
 		trueExit("","")
 	}

@@ -1,0 +1,95 @@
+<div class="flex-1 min-h-0 flex flex-row h-full px-4 pt-4 w-full">
+	<div class="flex flex-1 flex-col text-center">
+		<div
+			id="p-input"
+			class="flex-1 min-h-0 h-full border-2 rounded-md p-4 flex items-center justify-center flex-col text-center"
+		>
+			<input
+				id="file-picker"
+				type="file"
+				accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+				style="display: none"
+			/>
+			<div
+				id="drop-hint"
+				class="w-full h-full flex flex-col items-center justify-center gap-2"
+			>
+				<load src="components/icon_upload.html" />
+				<div>
+					<span data-i18n="drophint"></span>
+					<button
+						id="browse-btn"
+						class="btn btn-accent btn-xs"
+						data-i18n="drophintbtn"
+					></button>
+				</div>
+			</div>
+			<img
+				id="input-preview"
+				src=""
+				alt="Preview"
+				style="
+					width: 100%;
+					height: 100%;
+					display: none;
+					object-fit: contain;
+				"
+			/>
+		</div>
+		<div><span id="input-resolution"></span></div>
+	</div>
+	<div class="flex-none divider divider-horizontal"></div>
+	<div class="flex flex-1 flex-col text-center">
+		<div
+			id="p-output"
+			class="group relative overflow-hidden flex-1 min-h-0 h-full border-2 rounded-md p-4 flex items-center justify-center flex-col text-center transition-colors duration-200"
+		>
+			<!-- output preview image -->
+
+			<div
+				id="output-hint"
+				class="w-full h-full flex flex-col items-center justify-center gap-2"
+			>
+				<load src="components/icon_picture.html" />
+			</div>
+			<div
+				id="output-process"
+				class="w-full h-full hidden flex-col items-center justify-center"
+			>
+				<span
+					class="loading loading-dots text-primary loading-xl"
+				></span>
+			</div>
+			<img
+				id="output-preview"
+				src=""
+				alt="Output Preview"
+				class="transition duration-200"
+				style="
+					width: 100%;
+					height: 100%;
+					display: none;
+					object-fit: contain;
+				"
+			/>
+			<div
+				id="output-preview-overlay"
+				class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-base-content/25 opacity-0 transition duration-200"
+			>
+				<div class="flex gap-2">
+					<button
+						id="output-copy-btn"
+						class="btn btn-sm btn-primary pointer-events-auto"
+						data-i18n="copy"
+					></button>
+					<button
+						id="output-save-btn"
+						class="btn btn-sm btn-secondary pointer-events-auto"
+						data-i18n="save"
+					></button>
+				</div>
+			</div>
+		</div>
+		<div><span id="output-resolution"></span></div>
+	</div>
+</div>

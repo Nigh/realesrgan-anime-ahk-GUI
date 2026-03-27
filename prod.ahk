@@ -13,12 +13,4 @@ if A_Args.Length > 0
 		}
 	}
 }
-_exit(ThisHotkey){
-	ExitApp
-}
-_reload(ThisHotkey){
-	Reload
-}
-Hotkey("F5", _exit)
-Hotkey("F6", _reload)
 ;@Ahk2Exe-IgnoreEnd

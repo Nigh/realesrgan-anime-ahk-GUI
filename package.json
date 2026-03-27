@@ -1,0 +1,33 @@
+{
+  "name": "cyksm",
+  "private": true,
+  "version": "2.0.0",
+  "description": "A super resolution tool for anime style pictures",
+  "type": "module",
+  "scripts": {
+    "dev:ahk": "ahk64 run app.ahk",
+    "dev:front": "vite",
+    "prebuild:ahk": "ahk64 run gen_resource.ahk",
+    "build:ahk": "ahk64 compile /in app.ahk /compress 0",
+    "build:front": "vite build",
+    "preview:front": "vite preview",
+    "dev": "node scripts/dev.js",
+    "dev:watch": "set AHK_WATCH=1 && node scripts/dev.js",
+    "build": "npm run build:front && npm run build:ahk",
+    "preview": "start /B app.exe",
+    "predist": "npm run build",
+    "dist": "node scripts/dist.js"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.5.16",
+    "ahk64": "^2.0.19",
+    "chokidar": "^4.0.3",
+    "daisyui": "^5.1.29",
+    "vite": "^7.1.7",
+    "vite-plugin-html-inject": "^1.1.2"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
+}

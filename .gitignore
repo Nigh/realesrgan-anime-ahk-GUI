@@ -1,4 +1,13 @@
 
+resource.ahk
+*.7z
+*.exe
+.vscode
+dist/
+*.ini
+!realesrgan-ncnn-vulkan.exe
+!updater.exe
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
@@ -12,11 +21,32 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 
-.vscode
-
-dist/
-
-*.ini
-
 updater.h
 compile_prop.ahk
+version.txt
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+release
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
