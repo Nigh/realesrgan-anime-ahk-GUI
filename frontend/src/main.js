@@ -10,14 +10,118 @@
 	const pOutput = document.getElementById("p-output")
 	const outputPreview = document.getElementById("output-preview")
 	const outputProcess = document.getElementById("output-process")
+	const outputPreviewOverlay = document.getElementById(
+		"output-preview-overlay"
+	)
+	const outputCopyBtn = document.getElementById("output-copy-btn")
+	const outputSaveBtn = document.getElementById("output-save-btn")
 	const startBtn = document.getElementById("start-btn")
 	const resetHoverClasses = [
 		"cursor-pointer",
 		"hover:border-error",
 		"hover:bg-error/20",
 	]
+	const outputHoverClasses = ["border-accent", "bg-accent/10"]
 	let state = "idle"
 	window.getState = () => state
+
+	function hasValidImageSource(imgEl) {
+		return !!(
+			imgEl &&
+			imgEl.src &&
+			imgEl.src.trim() !== "" &&
+			imgEl.naturalWidth &&
+			imgEl.naturalHeight
+		)
+	}
+
+	function setOutputHoverActive(active) {
+		if (!hasValidImageSource(outputPreview) || state !== "done") {
+			pOutput.classList.remove(...outputHoverClasses)
+			outputPreview.classList.remove("blur-[2px]", "brightness-75")
+			outputPreviewOverlay.classList.add("hidden", "pointer-events-none")
+			outputPreviewOverlay.classList.remove("flex", "opacity-100")
+			return
+		}
+
+		pOutput.classList.toggle(outputHoverClasses[0], active)
+		pOutput.classList.toggle(outputHoverClasses[1], active)
+		outputPreview.classList.toggle("blur-[2px]", active)
+		outputPreview.classList.toggle("brightness-75", active)
+		outputPreviewOverlay.classList.remove("hidden")
+		outputPreviewOverlay.classList.add("flex")
+		outputPreviewOverlay.classList.toggle("opacity-100", active)
+		outputPreviewOverlay.classList.toggle("pointer-events-none", !active)
+	}
+
+	function resetOutputHoverState() {
+		setOutputHoverActive(false)
+	}
+
+	function getOutputFileName() {
+		return `output-${new Date().toISOString().replace(/[.:]/g, "-")}.png`
+	}
+
+	async function copyOutputImage() {
+		if (!hasValidImageSource(outputPreview)) return
+		try {
+			const response = await fetch(outputPreview.src)
+			const blob = await response.blob()
+			if (window.ClipboardItem && navigator.clipboard?.write) {
+				await navigator.clipboard.write([
+					new ClipboardItem({
+						[blob.type || "image/png"]: blob,
+					}),
+				])
+				window.showMessage("Image copied", "success")
+				return
+			}
+			throw new Error("Clipboard API unavailable")
+		} catch (error) {
+			console.error(error)
+			window.showMessage("Copy failed", "error")
+		}
+	}
+
+	function saveOutputImage() {
+		if (!hasValidImageSource(outputPreview)) return
+		saveOutputImageAs().catch((error) => {
+			if (error?.name === "AbortError") return
+			console.error(error)
+			fallbackDownloadOutputImage()
+		})
+	}
+
+	async function saveOutputImageAs() {
+		const response = await fetch(outputPreview.src)
+		const blob = await response.blob()
+
+		if (typeof window.showSaveFilePicker !== "function") {
+			throw new Error("showSaveFilePicker is unavailable")
+		}
+
+		const fileHandle = await window.showSaveFilePicker({
+			suggestedName: getOutputFileName(),
+			types: [
+				{
+					description: "PNG Image",
+					accept: { "image/png": [".png"] },
+				},
+			],
+		})
+		const writable = await fileHandle.createWritable()
+		await writable.write(blob)
+		await writable.close()
+		window.showMessage("Image saved", "success")
+	}
+
+	function fallbackDownloadOutputImage() {
+		const link = document.createElement("a")
+		link.href = outputPreview.src
+		link.download = getOutputFileName()
+		link.click()
+		window.showMessage("Save As unavailable, downloaded instead", "warning")
+	}
 
 	function updateResolutionText(img, resolutionElement) {
 		if (img && img.naturalWidth && img.naturalHeight) {
@@ -38,6 +142,22 @@
 
 	outputPreview.addEventListener("load", () => {
 		updateResolutionText(outputPreview, outputResolution)
+		resetOutputHoverState()
+	})
+
+	pOutput.addEventListener("mouseenter", () => setOutputHoverActive(true))
+	pOutput.addEventListener("mouseleave", resetOutputHoverState)
+
+	outputCopyBtn.addEventListener("click", async (e) => {
+		e.preventDefault()
+		e.stopPropagation()
+		await copyOutputImage()
+	})
+
+	outputSaveBtn.addEventListener("click", (e) => {
+		e.preventDefault()
+		e.stopPropagation()
+		saveOutputImage()
 	})
 
 	function prevent(e) {
@@ -128,6 +248,7 @@
 		}
 		if (source === null) {
 			applySrc("")
+			if (imgEl.id === "output-preview") resetOutputHoverState()
 			return
 		}
 		if (source instanceof Blob || source instanceof File) {
@@ -189,12 +310,14 @@
 			default:
 			case "idle":
 				pInput.classList.remove(...resetHoverClasses)
+				pOutput.classList.remove(...outputHoverClasses)
 				outputHint.style.display = "flex"
 				dropHint.style.display = "flex"
 
 				inputPreview.style.display = "none"
 				outputPreview.style.display = "none"
 				outputProcess.style.display = "none"
+				resetOutputHoverState()
 
 				filePicker.value = null
 
@@ -219,6 +342,7 @@
 				outputHint.style.display = "flex"
 				outputPreview.style.display = "none"
 				outputProcess.style.display = "none"
+				resetOutputHoverState()
 				outputResolution.setAttribute("data-i18n", "res_placeholder")
 				if (window.i18n) window.i18n.updateElement(outputResolution)
 
@@ -228,8 +352,10 @@
 				break
 			case "processing":
 				pInput.classList.remove(...resetHoverClasses)
+				pOutput.classList.remove(...outputHoverClasses)
 				outputHint.style.display = "none"
 				outputProcess.style.display = "flex"
+				resetOutputHoverState()
 				startBtn.classList.add("btn-disabled")
 				startBtn.setAttribute("data-i18n", "processing")
 				if (window.i18n) window.i18n.updateElement(startBtn)
@@ -238,6 +364,7 @@
 				pInput.classList.add(...resetHoverClasses)
 				outputPreview.style.display = "block"
 				outputProcess.style.display = "none"
+				resetOutputHoverState()
 				startBtn.classList.remove("btn-disabled")
 				startBtn.setAttribute("data-i18n", "reset")
 				if (window.i18n) window.i18n.updateElement(startBtn)

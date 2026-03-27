@@ -42,7 +42,7 @@
 	<div class="flex flex-1 flex-col text-center">
 		<div
 			id="p-output"
-			class="flex-1 min-h-0 h-full border-2 rounded-md p-4 flex items-center justify-center flex-col text-center"
+			class="group relative overflow-hidden flex-1 min-h-0 h-full border-2 rounded-md p-4 flex items-center justify-center flex-col text-center transition-colors duration-200"
 		>
 			<!-- output preview image -->
 
@@ -64,6 +64,7 @@
 				id="output-preview"
 				src=""
 				alt="Output Preview"
+				class="transition duration-200"
 				style="
 					width: 100%;
 					height: 100%;
@@ -71,6 +72,23 @@
 					object-fit: contain;
 				"
 			/>
+			<div
+				id="output-preview-overlay"
+				class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-base-content/25 opacity-0 transition duration-200"
+			>
+				<div class="flex gap-2">
+					<button
+						id="output-copy-btn"
+						class="btn btn-sm btn-primary pointer-events-auto"
+						data-i18n="copy"
+					></button>
+					<button
+						id="output-save-btn"
+						class="btn btn-sm btn-secondary pointer-events-auto"
+						data-i18n="save"
+					></button>
+				</div>
+			</div>
 		</div>
 		<div><span id="output-resolution"></span></div>
 	</div>
