@@ -1,7 +1,7 @@
 
 <div>
 	<div align="center">
-		<img height="180px" src="https://github.com/user-attachments/assets/530e2f35-849f-4481-83cf-07e5a021ed41"/>
+		<img height="180px" src="https://github.com/user-attachments/assets/7613a053-7c2c-4261-94cd-b0ad9403cd3b"/>
 	</div>
 	<div align="center">
 		<img src="https://capsule-render.vercel.app/api?type=transparent&fontColor=dbdbdb&text=次元克赛马&height=80&fontSize=48"/>
